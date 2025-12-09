@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Task</title>
+    <meta charset="UTF-8" />
+    <title>Edit Task</title>
 </head>
 <body>
 
-<h2>Add New Task</h2>
+<h2>Edit Task</h2>
 <p>
     <a href="/api/tasks">Task List</a>
 </p>
-
 <div th:if="${errorMessage}" style="color:red; margin-bottom: 10px;">
     <p th:text="${errorMessage}"></p>
 </div>
 
-<form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
+<form th:action="@{/api/tasks/edit/{id}(id=${task.id})}" th:object="${task}" method="post">
 
     <label>Title:</label>
     <input type="text" th:field="*{title}" required /><br/><br/>
@@ -27,18 +27,19 @@
 
     <label>Status:</label>
     <select th:field="*{status}">
-        <option value="Pending">PENDING</option>
-        <option value="Done">DONE</option>
+        <option value="Pending">Pending</option>
+        <option value="Done">Done</option>
     </select><br/><br/>
 
     <label>Priority:</label>
     <select th:field="*{priority}">
-        <option value="Low">LOW</option>
-        <option value="Medium">MEDIUM</option>
-        <option value="High">HIGH</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
     </select><br/><br/>
 
-    <button type="submit">Save Task</button>
+    <button type="submit">Update Task</button>
+    <a th:href="@{/api/tasks}">Cancel</a>
 
 </form>
 

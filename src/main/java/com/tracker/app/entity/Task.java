@@ -1,8 +1,14 @@
 package com.tracker.app.entity;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
 public class Task {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "task_id")
     private Integer id;
     private String title;
     private String description;
