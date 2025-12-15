@@ -3,7 +3,10 @@ package com.tracker.app.controller;
 
 import com.tracker.app.entity.Task;
 import com.tracker.app.service.TaskService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -21,14 +24,15 @@ public class TaskRestController {
     private final TaskService taskService;
 
     @Autowired
-    public TaskRestController(TaskService taskService) {
-        this.taskService = taskService;
+    public TaskRestController(TaskService taskService){
+    this.taskService = taskService;
     }
-//    @GetMapping
-//    public String listTasks(Model model){
-//        model.addAttribute("tasks", taskService.getAllTasks());
-//        return "tasks";
-//    }
+    @GetMapping
+    public ResponseEntity<Page<Task>> getAll(Pageable pageable){
+        Page<Task> page= taskService.findAll(pageable);
+        return ResponseEntity.ok(page);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Integer id) {

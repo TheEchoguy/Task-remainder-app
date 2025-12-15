@@ -6,6 +6,8 @@ import com.tracker.app.entity.Task;
 import com.tracker.app.repository.TaskRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,5 +52,9 @@ public class TaskService {
 
     public List<Task> findAll() {
         return taskRepository.findAll();
+    }
+
+    public Page<Task> findAll(Pageable pageable) {
+        return taskRepository.findAll(pageable);
     }
 }

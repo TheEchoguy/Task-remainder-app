@@ -2,12 +2,14 @@ package com.tracker.app.controller;
 
 import com.tracker.app.entity.Task;
 import com.tracker.app.service.TaskService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 @RequestMapping("/api/tasks")
@@ -16,11 +18,36 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @GetMapping
-    public String listTasks(Model model){
-        model.addAttribute("tasks", taskService.getAllTasks());
+    @GetMapping()
+    public String listTasks(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort,
+            Model model) {
+
+        List<Task> tasks = null;
+
+        if (status != null && !status.isEmpty()) {
+            tasks = taskService.findByStatus(status);
+
+        } else if (priority != null && !priority.isEmpty()) {
+            tasks = taskService.findByPriority(priority);
+
+        } else if (keyword != null && !keyword.isEmpty()) {
+            tasks = taskService.searchByTitle(keyword);
+
+        } else if (sort != null && !sort.isEmpty()) {
+           // tasks = taskService.sortByField(sort);
+
+        } else {
+            tasks = taskService.getAllTasks();
+        }
+
+        model.addAttribute("tasks", tasks);
         return "tasks";
     }
+
     @GetMapping("/add")
     public String showAddForm(Model model){
         model.addAttribute("task",new Task());
@@ -84,6 +111,18 @@ public class TaskController {
         taskService.deleteTask(id);
         return "redirect:/api/tasks";
     }
+    @GetMapping("/markdone/{id}")
+    public String markAsDone(@PathVariable Integer id) {
+        Task task = taskService.findById(id).orElse(null);
+
+        if (task != null) {
+            task.setStatus("Done");
+            taskService.updateTask(task);
+        }
+
+        return "redirect:/api/tasks";
+    }
+
 
 
 }
