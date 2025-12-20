@@ -102,10 +102,10 @@
     <form th:action="@{/api/tasks/edit/{id}(id=${task.id})}" th:object="${task}" method="post">
 
         <label>Title <span class="required">*</span></label>
-        <input type="text" th:field="*{title}" required />
+        <input type="text" th:field="*{title}" required minlength="5" maxlength="100" />
 
         <label>Description</label>
-        <textarea th:field="*{description}"></textarea>
+        <textarea th:field="*{description}" maxlength="200"></textarea>
 
         <label>Due Date <span class="required">*</span></label>
         <input type="date" th:field="*{dueDate}" required />

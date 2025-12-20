@@ -76,6 +76,10 @@
     </style>
 </head>
 <body>
+<div class="container">
+    <div th:if="${successMessage}" class="flash flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash flash-success" th:text="${errorMessage}"></div>
+</div>
 <h2>All Tasks</h2>
 
 <div class="top-nav">

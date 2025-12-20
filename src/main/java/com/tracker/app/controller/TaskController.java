@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,7 +55,7 @@ public class TaskController {
         return "add-task";
     }
     @PostMapping("/add")
-    public String saveTask(@ModelAttribute Task task , Model model){
+    public String saveTask(@ModelAttribute Task task , Model model , RedirectAttributes ra){
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Title is required!");
             model.addAttribute("task", task);
@@ -69,6 +70,7 @@ public class TaskController {
 
         task.setCreatedAt(LocalDateTime.now());
         taskService.addTask(task);
+        ra.addFlashAttribute("successMessage","Task added successfully!!");
         return "redirect:/api/tasks";
     }
     @GetMapping("/edit/{id}")
@@ -80,7 +82,7 @@ public class TaskController {
     }
 
     @PostMapping("/edit/{id}")
-    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model) {
+    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra) {
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Title is required!");
             model.addAttribute("task", task);
@@ -98,6 +100,7 @@ public class TaskController {
         }
         task.setCreatedAt(existing.getCreatedAt());
         taskService.updateTask(task);
+        ra.addFlashAttribute("successMessage","Task updated successfully !!");
         return "redirect:/api/tasks";
     }
 
@@ -117,6 +120,17 @@ public class TaskController {
 
         if (task != null) {
             task.setStatus("Done");
+            taskService.updateTask(task);
+        }
+
+        return "redirect:/api/tasks";
+    }
+    @GetMapping("/markpending/{id}")
+    public String markAsPending(@PathVariable Integer id) {
+        Task task = taskService.findById(id).orElse(null);
+
+        if (task != null) {
+            task.setStatus("Pending");
             taskService.updateTask(task);
         }
 

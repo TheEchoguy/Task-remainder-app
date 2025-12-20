@@ -86,10 +86,10 @@
     <form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
 
         <label>Title <span style="color:red">*</span></label>
-        <input type="text" th:field="*{title}" placeholder="Enter task title" required />
+        <input type="text" th:field="*{title}"  placeholder="Enter task title" required minlength="3" maxlength="100" />
 
         <label>Description</label>
-        <textarea th:field="*{description}" placeholder="Enter description"></textarea>
+        <textarea th:field="*{description}" placeholder="Enter description" maxlength="200"></textarea>
 
         <label>Due Date <span style="color:red">*</span></label>
         <input type="date" th:field="*{dueDate}" required />
@@ -112,6 +112,9 @@
     </form>
 
 </div>
+<footer>
+    <div>Task Reminder App @2025 - Created by Santhosh</div>
+</footer>
 
 </body>
 </html>
