@@ -4,7 +4,10 @@ import java.util.Optional;
 
 import com.tracker.app.entity.Task;
 import com.tracker.app.repository.TaskRepository;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,5 +31,30 @@ public class TaskService {
     public void deleteTask(Integer id){
         taskRepository.deleteById(id);
 
+    }
+
+    public List<Task> findByStatus(String status) {
+        return taskRepository.findByStatus(status);
+    }
+
+
+    public List<Task> findByPriority(String priority) {
+        return taskRepository.findByPriority(priority);
+    }
+
+    public List<Task> searchByTitle(String keyword) {
+        return taskRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    public List<Task> findByDueDate(String date) {
+        return taskRepository.findByDueDate(date);
+    }
+
+    public List<Task> findAll() {
+        return taskRepository.findAll();
+    }
+
+    public Page<Task> findAll(Pageable pageable) {
+        return taskRepository.findAll(pageable);
     }
 }
