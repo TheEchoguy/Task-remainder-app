@@ -1,133 +1,95 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Edit Task</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
-        }
-
-        h2 {
-            margin-left: 40px;
-            margin-top: 30px;
-            font-size: 26px;
-        }
-
-        .back-btn {
-            margin-left: 40px;
-            display: inline-block;
-            margin-bottom: 20px;
-            background: #eee;
-            padding: 8px 18px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #000;
-            border: 1px solid #ccc;
-        }
-
-        .container {
-            width: 50%;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            margin-top: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #ccc;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 15px;
-        }
-
-        input[type="text"], input[type="date"], select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-top: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-        }
-
-        textarea {
-            height: 140px;
-            resize: vertical;
-        }
-
-        .btn-save {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #1f78b4;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            margin-left: 10px;
-            text-decoration: none;
-            color: #1f78b4;
-            font-size: 16px;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
-
-        .required {
-            color: red;
-        }
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" th:href="@{/css/edit-task.css}">
 </head>
 <body>
 
-<h2>Edit Task</h2>
+<!-- ===== Header ===== -->
+<header class="app-header">
+    <div class="header-container">
+        <h1>Task Reminder Application</h1>
 
-<a href="/api/tasks" class="back-btn">← Back to Task List</a>
-
-<div class="container">
-
-    <div th:if="${errorMessage}" class="error">
-        <p th:text="${errorMessage}"></p>
+        <a th:href="@{/api/tasks}" class="header-btn">
+            Task List
+        </a>
     </div>
+</header>
 
-    <form th:action="@{/api/tasks/edit/{id}(id=${task.id})}" th:object="${task}" method="post">
+<!-- ===== Page Wrapper ===== -->
+<div class="page-wrapper">
 
-        <label>Title <span class="required">*</span></label>
-        <input type="text" th:field="*{title}" required minlength="5" maxlength="100" />
+    <div class="card">
 
-        <label>Description</label>
-        <textarea th:field="*{description}" maxlength="200"></textarea>
+        <h2>Edit Task</h2>
 
-        <label>Due Date <span class="required">*</span></label>
-        <input type="date" th:field="*{dueDate}" required />
+        <!-- Error Message -->
+        <div th:if="${errorMessage}" class="error-box">
+            <p th:text="${errorMessage}"></p>
+        </div>
 
-        <label>Status</label>
-        <select th:field="*{status}">
-            <option value="Pending">Pending</option>
-            <option value="Done">Done</option>
-        </select>
+        <!-- Form -->
+        <form th:action="@{/api/tasks/edit/{id}(id=${task.id})}"
+              th:object="${task}"
+              method="post">
 
-        <label>Priority</label>
-        <select th:field="*{priority}">
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-        </select>
+            <label>Title <span class="required">*</span></label>
+            <input type="text"
+                   th:field="*{title}"
+                   required
+                   minlength="3"
+                   maxlength="100"/>
 
-        <button type="submit" class="btn-save">Save Changes</button>
-        <a th:href="@{/api/tasks}" class="btn-cancel">Cancel</a>
-    </form>
+            <label>Description</label>
+            <textarea th:field="*{description}"
+                      maxlength="200"></textarea>
 
+            <label>Due Date <span class="required">*</span></label>
+            <input type="date"
+                   th:field="*{dueDate}"
+                   required/>
+
+            <label>Status</label>
+            <select th:field="*{status}">
+                <option value="">-- Select Status --</option>
+                <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
+                        th:value="${s}"
+                        th:text="${#strings.capitalize(#strings.replace(s.name().toLowerCase(),'_',' '))}">
+                </option>
+            </select>
+
+            <label>Priority</label>
+            <select th:field="*{priority}">
+                <option value="">-- Select Priority --</option>
+                <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
+                        th:value="${p}"
+                        th:text="${#strings.capitalize(p.name().toLowerCase())}">
+                </option>
+            </select>
+
+            <!-- Buttons -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a th:href="@{/api/tasks}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
 </div>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+    © 2025 Task Reminder Application — Created by <strong>Santhosh</strong>
+</footer>
 
 </body>
 </html>

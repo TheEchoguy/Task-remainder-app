@@ -1,0 +1,288 @@
+/* ===== RESET & BASE ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+/* ===== HEADER (FULL WIDTH) ===== */
+.app-header {
+    width: 100%;
+    background: linear-gradient(90deg, #1f78b4, #2b8fd8);
+    padding: 14px 24px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.header-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-header h1 {
+    margin: 0;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* ===== Header Add Task Button ===== */
+.header-actions .btn-primary {
+    background: #ffffff;
+    color: #1f78b4;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+    transition: all 0.2s ease;
+}
+
+.header-actions .btn-primary:hover {
+    background: #f0f6fb;
+    transform: translateY(-1px);
+}
+
+
+/* ===== PAGE WRAPPER ===== */
+.page-wrapper {
+    width: 100%;
+    padding: 24px;
+}
+
+/* ===== CARD (FULLY RESPONSIVE) ===== */
+.card {
+    width: 100%;
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+/* ===== TITLE ===== */
+h2 {
+    margin: 0 0 18px;
+}
+
+/* ===== FILTER BAR ===== */
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #f8f9fa;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-input {
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* ===== SORT GROUP ===== */
+.sort-group {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-label {
+    font-weight: 600;
+    color: #444;
+}
+
+.sort-link {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #d0d6db;
+    background: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f78b4;
+    transition: all 0.2s ease;
+}
+
+.sort-link:hover {
+    background: #eef6fd;
+    border-color: #1f78b4;
+}
+
+/* ===== TABLE WRAPPER ===== */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th, td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e6e6e6;
+    text-align: left;
+}
+
+thead {
+    background: #f8f8f8;
+}
+
+/* ===== STATUS ===== */
+.status {
+    font-weight: 600;
+}
+
+.status-done {
+    color: #2e8b57;
+}
+
+.status-pending {
+    color: #1f78b4;
+}
+
+/* ===== PRIORITY BADGES ===== */
+.badge {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.badge-high {
+    background: #ffdfe0;
+    color: #b22222;
+}
+
+.badge-medium {
+    background: #fff3e0;
+    color: #e67e22;
+}
+
+.badge-low {
+    background: #e9f7ee;
+    color: #2e8b57;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.action-btn.danger {
+    color: #b22222;
+    border-color: #f1b0b0;
+}
+
+.action-btn:hover {
+    background: #f4f7fb;
+}
+
+/* ===== MARK DONE BUTTON ===== */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #b6e2c2;
+    background: linear-gradient(135deg, #e9f7ee, #dff2e8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.icon-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-btn:hover {
+    background: #2e8b57;
+    border-color: #2e8b57;
+    transform: scale(1.08);
+}
+
+.icon-btn:hover svg path {
+    stroke: #ffffff;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.page-btn,
+.page-number {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    text-decoration: none;
+    color: #333;
+}
+
+.page-number.active {
+    background: #1f78b4;
+    color: #fff;
+    border-color: #1f78b4;
+    font-weight: bold;
+}
+
+.page-btn.disabled {
+    pointer-events: none;
+    opacity: 0.45;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 30px;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    background: #f8f9fa;
+}
+/* ===== Clear (Reset) Button ===== */
+.btn-clear {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-clear:hover {
+        background: #f4f7fb;
+
+}

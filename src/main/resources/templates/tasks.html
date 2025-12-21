@@ -1,233 +1,206 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>All Tasks</title>
-
-    <style>
-        /* Page */
-        body { font-family: Arial, sans-serif; padding: 18px; }
-        h2 { margin-bottom: 8px; }
-
-        /* Top nav / actions */
-        .top-nav { margin-bottom: 12px; }
-        .top-nav a { text-decoration: none; margin-right: 8px; padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; background:#f4f4f4; color: #111; }
-        .btn-primary { background:#1f78b4; color:white; border-color:#1f78b4; }
-
-        /* Filters */
-        .filters { margin-bottom: 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-        .filters label { margin-right:4px; font-size:0.95rem; }
-        .filter-input { margin-right:8px; padding:4px 6px; border-radius:4px; border:1px solid #ccc; }
-        .small { font-size:0.9rem; }
-
-        /* Table */
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
-        th { background:#f8f8f8; font-weight:700; }
-        tr.overdue { background-color: #fff0f0; } /* optional overdue highlight */
-
-        /* Badges / status / priority */
-        .badge { padding: 4px 6px; border-radius: 4px; font-weight: 600; display:inline-block; font-size:0.9rem; }
-        .badge-high { color:#b22222; background:#ffdfe0; }    /* red-ish */
-        .badge-medium { color:#e67e22; background:#fff3e0; }  /* orange-ish */
-        .badge-low { color:#2e8b57; background:#e9f7ee; }     /* green-ish */
-
-        .status { padding:4px 8px; border-radius: 4px; font-weight:600; font-size:0.85rem; display:inline-block; }
-        .status-done { color:#2e8b57; }      /* green text */
-        .status-pending { color:#1f78b4; }   /* blue text */
-
-        /* Actions */
-        .actions { display:flex; gap:8px; align-items:center; justify-content:flex-start; }
-        .action-btn {
-            display:inline-flex;
-            align-items:center;
-            gap:6px;
-            padding:6px 8px;
-            border-radius:6px;
-            border:1px solid #d0d6db;
-            background:white;
-            color:#1f3ea8;
-            text-decoration:none;
-            font-size:0.9rem;
-            cursor:pointer;
-        }
-        .action-btn:hover { background:#f4f7fb; }
-        .action-btn.danger { border-color:#e0b4b4; color:#b22222; }
-        .icon {
-            width:16px; height:16px; display:inline-block; vertical-align:middle;
-        }
-
-        /* compact icon-only button */
-        .icon-btn {
-            display:inline-grid;
-            place-items:center;
-            width:34px;
-            height:34px;
-            border-radius:6px;
-            border:1px solid #d0d6db;
-            background:white;
-            cursor:pointer;
-            text-decoration:none;
-        }
-        .icon-btn:hover { background:#f4f7fb; }
-
-        /* small helper */
-        small { font-size:0.9rem; color:#333; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<div class="container">
-    <div th:if="${successMessage}" class="flash flash-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="flash flash-success" th:text="${errorMessage}"></div>
+
+<header class="app-header">
+    <div class="header-container">
+        <h1>Task Reminder Application</h1>
+        <div class="header-actions">
+            <a th:href="@{/api/tasks/add}" class="btn btn-primary">+ Add Task</a>
+        </div>
+    </div>
+</header>
+
+<div class="page-wrapper">
+    <div class="card">
+
+        <h2>All Tasks</h2>
+
+        <!-- Filters -->
+        <form class="filters" th:action="@{/api/tasks}" method="get">
+            <label>Status:</label>
+            <select name="status" class="filter-input">
+                <option value="">All</option>
+                <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
+                        th:value="${s}"
+                        th:text="${#strings.capitalize(#strings.replace(s.name().toLowerCase(),'_',' '))}">
+                </option>
+            </select>
+
+            <label>Priority:</label>
+            <select name="priority" class="filter-input">
+                <option value="">All</option>
+                <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
+                        th:value="${p}"
+                        th:text="${#strings.capitalize(p.name().toLowerCase())}">
+                </option>
+            </select>
+            <label>Title:</label>
+            <input type="text" name="keyword" placeholder="Search title"
+                   class="filter-input" th:value="${param.keyword}">
+
+            <button class="btn btn-clear">Filter</button>
+            <a th:href="@{/api/tasks}" class="btn btn-clear">Clear</a>
+            <div class="sort-group">
+                <span class="sort-label">Sort:</span>
+
+                <a th:href="@{/api/tasks(
+                        sort='dueDate',
+                    status=${param.status},
+                    priority=${param.priority},
+                    keyword=${param.keyword}
+                    )}"
+                    class="sort-link">
+                    Due Date
+                </a>
+
+                <a th:href="@{/api/tasks(
+                    sort='priority',
+                    status=${param.status},
+                    priority=${param.priority},
+                    keyword=${param.keyword}
+                    )}"
+                    class="sort-link">
+                    Priority
+                </a>
+
+                <a th:href="@{/api/tasks(
+                    sort='title',
+                    status=${param.status},
+                    priority=${param.priority},
+                    keyword=${param.keyword}
+                    )}"
+                    class="sort-link">
+                    Title
+                </a>
+            </div>
+
+
+        </form>
+
+        <!-- Table -->
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Created At</th>
+                <th>Completed At</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="task : ${tasks}">
+                <td th:text="${task.id}"></td>
+                <td th:text="${task.title}"></td>
+                <td th:text="${task.description}"></td>
+                <td th:text="${task.dueDate}"></td>
+
+                <td>
+                    <span class="status"
+                          th:text="${#strings.capitalize(#strings.replace(task.status.name().toLowerCase(),'_',' '))}"
+                          th:classappend="${task.status.name()=='DONE'} ? ' status-done':' status-pending'">
+                    </span>
+                </td>
+
+                <td>
+                    <span class="badge"
+                          th:text="${#strings.capitalize(task.priority.name().toLowerCase())}"
+                          th:classappend="' badge-' + ${task.priority.name().toLowerCase()}">
+                    </span>
+                </td>
+
+                <td th:text="${#temporals.format(task.createdAt,'dd-MM-yyyy HH:mm')}"></td>
+
+                <td>
+                    <span th:if="${task.completedAt != null}"
+                          th:text="${#temporals.format(task.completedAt,'dd-MM-yyyy HH:mm')}"></span>
+                    <span th:if="${task.completedAt == null}">—</span>
+                </td>
+
+                <td class="actions">
+
+                    <!-- View -->
+                    <a th:href="@{/api/tasks/view/{id}(id=${task.id})}"
+                       class="action-btn">
+                        View
+                    </a>
+
+                    <!-- Edit -->
+                    <a th:href="@{/api/tasks/edit/{id}(id=${task.id})}"
+                       class="action-btn">
+                        Edit
+                    </a>
+
+                    <!-- Delete -->
+                    <a th:href="@{/api/tasks/delete/{id}(id=${task.id})}"
+                       class="action-btn danger"
+                       onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+
+                    <!-- Mark Done (only if NOT DONE) -->
+                    <a th:if="${task.status != T(com.tracker.app.enums.TaskStatus).DONE}"
+                       th:href="@{/api/tasks/markdone/{id}(id=${task.id})}"
+                       class="icon-btn"
+                       title="Mark as Done"
+                       onclick="return confirm('Mark this task as DONE?')">
+
+                        <svg viewBox="0 0 24 24" fill="none"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17l-5-5"
+                                  stroke="#2e8b57"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+
+                </td>
+
+            </tr>
+            </tbody>
+            <tr th:if="${#lists.isEmpty(tasks)}">
+                <td colspan="9" style="text-align:center; padding:20px;">
+                    No tasks found.
+                </td>
+            </tr>
+
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-btn"
+               th:classappend="${currentPage==0}? ' disabled':''"
+               th:href="@{/api/tasks(page=${currentPage-1})}">‹ Prev</a>
+
+            <a th:each="i : ${#numbers.sequence(0,totalPages-1)}"
+               th:href="@{/api/tasks(page=${i})}"
+               th:text="${i+1}"
+               class="page-number"
+               th:classappend="${i==currentPage}? ' active':''"></a>
+
+            <a class="page-btn"
+               th:classappend="${currentPage==totalPages-1}? ' disabled':''"
+               th:href="@{/api/tasks(page=${currentPage+1})}">Next ›</a>
+        </div>
+
+    </div>
 </div>
-<h2>All Tasks</h2>
 
-<div class="top-nav">
-    <a th:href="@{/api/tasks/add}" class="btn btn-primary">Add Task</a>
-</div>
+<footer class="footer">
+    © 2025 Task Reminder Application — Created by <strong>Santhosh</strong>
+</footer>
 
-
-<form class="filters" action="#" th:action="@{/api/tasks}" method="get">
-    <div>
-        <label for="status">Status:</label>
-        <select name="status" id="status" class="filter-input">
-            <option value="" th:selected="${param.status == null or param.status == ''}">All</option>
-            <option value="Pending" th:selected="${param.status == 'Pending'}">Pending</option>
-            <option value="Done" th:selected="${param.status == 'Done'}">Done</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="priority">Priority:</label>
-        <select name="priority" id="priority" class="filter-input">
-            <option value="" th:selected="${param.priority == null or param.priority == ''}">All</option>
-            <option value="High" th:selected="${param.priority == 'High'}">High</option>
-            <option value="Medium" th:selected="${param.priority == 'Medium'}">Medium</option>
-            <option value="Low" th:selected="${param.priority == 'Low'}">Low</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="keyword">Search Title:</label>
-        <input type="text" id="keyword" name="keyword" placeholder="keyword" class="filter-input small"
-               th:value="${param.keyword}" />
-    </div>
-
-    <div>
-        <button type="submit" class="btn">Filter</button>
-        <a th:href="@{/api/tasks}" class="btn" style="text-decoration:none; margin-left:6px;">Clear Filters</a>
-    </div>
-
-    <div style="margin-left:auto; font-size:0.95rem;">
-        Sort:
-        <a th:href="@{/api/tasks(sort='dueDate')}" style="margin-left:6px;">Due Date</a> |
-        <a th:href="@{/api/tasks(sort='priority')}" style="margin-left:6px;">Priority</a> |
-        <a th:href="@{/api/tasks(sort='title')}" style="margin-left:6px;">Title</a>
-    </div>
-</form>
-
-
-<table>
-    <thead>
-    <tr>
-        <th style="width:50px;">ID</th>
-        <th style="width:180px;">Title</th>
-        <th>Description</th>
-        <th style="width:110px;">Due Date</th>
-        <th style="width:110px;">Status</th>
-        <th style="width:110px;">Priority</th>
-        <th style="width:190px;">Created At</th>
-        <th style="width:160px;">Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="task : ${tasks}"
-        th:classappend="${task.dueDate != null and T(java.time.LocalDate).parse(task.dueDate).isBefore(T(java.time.LocalDate).now()) and task.status != 'Done'} ? ' overdue' : ''">
-
-        <td th:text="${task.id}">1</td>
-        <td th:text="${task.title}">Sample Title</td>
-        <td th:text="${task.description}">Sample description</td>
-        <td th:text="${task.dueDate}">2025-01-01</td>
-
-        <td>
-            <span th:text="${task.status}"
-                  th:class="${task.status == 'Done'} ? 'status status-done' : 'status status-pending'">
-                Pending
-            </span>
-        </td>
-
-
-        <td>
-            <span th:switch="${task.priority}">
-                <span th:case="'High'" class="badge badge-high" th:text="${task.priority}">High</span>
-                <span th:case="'Medium'" class="badge badge-medium" th:text="${task.priority}">Medium</span>
-                <span th:case="*" class="badge badge-low" th:text="${task.priority}">Low</span>
-            </span>
-        </td>
-
-
-        <td th:text="${#temporals.format(task.createdAt, 'dd-MM-yyyy HH:mm')}">2025-01-01 12:00</td>
-        <td class="actions">
-
-            <a th:href="@{/api/tasks/edit/{id}(id=${task.id})}" class="action-btn" title="Edit">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" stroke="#1f3ea8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" stroke="#1f3ea8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Edit
-            </a>
-
-            <a th:href="@{/api/tasks/delete/{id}(id=${task.id})}"
-               class="action-btn danger"
-               th:onclick="return confirm('Are you sure you want to delete the task')"
-               title="Delete">
-
-                <svg class="icon" viewBox="0 0 24 24" fill="none"
-                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M3 6h18" stroke="#b22222" stroke-width="1.2"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6"
-                          stroke="#b22222" stroke-width="1.2"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M10 11v6M14 11v6"
-                          stroke="#b22222" stroke-width="1.2"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"
-                          stroke="#b22222" stroke-width="1.2"
-                          stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-
-                Delete
-            </a>
-
-
-
-
-            <a th:if="${task.status != 'Done'}"
-               th:href="@{/api/tasks/markdone/{id}(id=${task.id})}"
-               class="icon-btn" title="Mark Done">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M20 6L9 17l-5-5" stroke="#2e8b57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-
-            <a th:if="${task.status == 'Done'}"
-               th:href="@{/api/tasks/markpending/{id}(id=${task.id})}"
-               class="icon-btn" title="Mark Pending">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M19 7L9 17M9 7l10 10" stroke="#d9534f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-        </td>
-    </tr>
-
-    <tr th:if="${#lists.isEmpty(tasks)}">
-        <td colspan="8" style="text-align:center; padding:18px;">No tasks found.</td>
-    </tr>
-    </tbody>
-</table>
-
-<script>
-</script>
 </body>
 </html>

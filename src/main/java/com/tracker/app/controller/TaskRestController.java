@@ -2,6 +2,8 @@ package com.tracker.app.controller;
 
 
 import com.tracker.app.entity.Task;
+import com.tracker.app.enums.TaskPriority;
+import com.tracker.app.enums.TaskStatus;
 import com.tracker.app.service.TaskService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,18 +77,18 @@ public class TaskRestController {
     }
 
    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Task>> getByStatus(@PathVariable String status) {
-        return ResponseEntity.ok(taskService.findByStatus(status));
+    public ResponseEntity<Page<Task>> getByStatus(@PathVariable TaskStatus status,Pageable pageable) {
+        return ResponseEntity.ok(taskService.findByStatus(status,pageable));
     }
 
    @GetMapping("/priority/{priority}")
-    public ResponseEntity<List<Task>> getByPriority(@PathVariable String priority) {
-        return ResponseEntity.ok(taskService.findByPriority(priority));
+    public ResponseEntity<Page<Task>> getByPriority(@PathVariable TaskPriority priority,Pageable pageable) {
+        return ResponseEntity.ok(taskService.findByPriority(priority,pageable));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Task>> searchByTitle(@RequestParam("keyword") String keyword) {
-        return ResponseEntity.ok(taskService.searchByTitle(keyword));
+    public ResponseEntity<Page<Task>> searchByTitle(@RequestParam("keyword") String keyword,Pageable pageable) {
+        return ResponseEntity.ok(taskService.searchByTitle(keyword,pageable));
     }
 
     @GetMapping("/due")

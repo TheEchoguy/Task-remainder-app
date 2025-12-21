@@ -3,6 +3,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.tracker.app.entity.Task;
+import com.tracker.app.enums.TaskPriority;
+import com.tracker.app.enums.TaskStatus;
 import com.tracker.app.repository.TaskRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +34,33 @@ public class TaskService {
         taskRepository.deleteById(id);
 
     }
+    public Page<Task> findByStatusAndPriority(TaskStatus status,TaskPriority priority,Pageable pageable){
+        return taskRepository.findByStatusAndPriority(status,priority,pageable);
+    }
 
-    public List<Task> findByStatus(String status) {
-        return taskRepository.findByStatus(status);
+    public Page<Task> findByStatus(TaskStatus status,Pageable pageable) {
+        return taskRepository.findByStatus(status,pageable);
+    }
+    public Page<Task> getPagedTasks(Pageable pageable,TaskStatus status,TaskPriority priority,String keyword){
+        if(status!= null && priority!= null){
+            return taskRepository.findByStatusAndPriority(status,priority,pageable);
+        } else if (status!=null) {
+            return taskRepository.findByStatus(status,pageable);
+        } else if (priority!=null) {
+            return taskRepository.findByPriority(priority,pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            return taskRepository.findByTitleContainingIgnoreCase(keyword,pageable);
+        }
+        return taskRepository.findAll(pageable);
     }
 
 
-    public List<Task> findByPriority(String priority) {
-        return taskRepository.findByPriority(priority);
+    public Page<Task> findByPriority(TaskPriority priority,Pageable pageable) {
+        return taskRepository.findByPriority(priority,pageable);
     }
 
-    public List<Task> searchByTitle(String keyword) {
-        return taskRepository.findByTitleContainingIgnoreCase(keyword);
+    public Page<Task> searchByTitle(String keyword,Pageable pageable) {
+        return taskRepository.findByTitleContainingIgnoreCase(keyword,pageable);
     }
 
     public List<Task> findByDueDate(String date) {
