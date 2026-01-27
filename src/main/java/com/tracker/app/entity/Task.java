@@ -21,6 +21,14 @@ public class Task {
     private TaskPriority priority;
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+    @Column(name = "reminder_sent")
+    private Boolean reminderSent = false;
+    @Column(name = "reminder_time")
+    private LocalDateTime reminderTime;
+
 
     public Task(){
 
@@ -97,6 +105,26 @@ public class Task {
     public LocalDateTime getCompletedAt() { return completedAt; }
 
     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt;}
+
+    public User getUser(){ return user;}
+
+    public User setUser(User user){ return this.user= user;}
+
+    public Boolean getReminderSent() {
+        return reminderSent;
+    }
+
+    public void setReminderSent(Boolean reminderSent) {
+        this.reminderSent = reminderSent;
+    }
+
+    public LocalDateTime getReminderTime() {
+        return reminderTime;
+    }
+
+    public void setReminderTime(LocalDateTime reminderTime) {
+        this.reminderTime = reminderTime;
+    }
 
 }
 

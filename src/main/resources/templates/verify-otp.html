@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | Task Reminder App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(#f4f8ff, #ffffff);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .navbar {
+            height: 64px;
+            background: #1f78d1;
+            color: #fff;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* ===== PAGE ===== */
+        .page {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 36px;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+            text-align: center;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 26px;
+        }
+
+        /* ===== OTP INPUT ===== */
+        .otp-input {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 22px;
+            text-align: center;
+            letter-spacing: 10px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .otp-input:focus {
+            border-color: #1f78d1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(31,120,209,0.15);
+        }
+
+        /* ===== TIMER ===== */
+        .timer {
+            margin-top: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        /* ===== BUTTON ===== */
+        .btn {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1f78d1, #155aa8);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 10px 20px rgba(31,120,209,0.3);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(31,120,209,0.35);
+        }
+
+        .btn:disabled {
+            background: #9bbfe3;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* ===== RESEND ===== */
+        .resend {
+            margin-top: 18px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .resend button {
+            background: none;
+            border: none;
+            color: #1f78d1;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .resend button:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* ===== MESSAGE ===== */
+        .message {
+            margin-top: 14px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">Task Reminder App</div>
+
+<div class="page">
+    <div class="card">
+
+        <h2>Verify OTP 🔐</h2>
+        <div class="info">
+            Enter the 6-digit OTP sent to your registered email
+        </div>
+
+        <input type="text"
+               id="otp"
+               class="otp-input"
+               maxlength="6"
+               placeholder="••••••"
+               inputmode="numeric">
+
+        <div id="timer" class="timer"></div>
+
+        <button id="verifyBtn" class="btn" onclick="verifyOtp()">Verify</button>
+
+        <div class="resend">
+            Didn’t receive OTP?
+            <button id="resendBtn" onclick="resendOtp()" disabled>
+                Resend OTP
+            </button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+</div>
+
+<script>
+    let timeLeft = 300;
+    let interval;
+
+    const timerEl = document.getElementById("timer");
+    const resendBtn = document.getElementById("resendBtn");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const msg = document.getElementById("message");
+
+    function startTimer() {
+        resendBtn.disabled = true;
+        verifyBtn.disabled = false;
+        clearInterval(interval);
+
+        interval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            timerEl.textContent =
+                `OTP expires in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(interval);
+                timerEl.textContent = "OTP expired";
+                resendBtn.disabled = false;
+                verifyBtn.disabled = true;
+
+                msg.textContent = "OTP expired. Please resend OTP.";
+                msg.className = "message error";
+            }
+        }, 1000);
+    }
+
+    async function verifyOtp() {
+        const otp = document.getElementById("otp").value;
+
+        if (!otp || otp.length !== 6) {
+            msg.textContent = "Enter a valid 6-digit OTP";
+            msg.className = "message error";
+            return;
+        }
+
+        try {
+            const res = await fetch("/verify", {
+            method: "POST",
+            credentials: "same-origin",   // ✅ IMPORTANT
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ otp })
+            });
+
+
+            const result = await res.text();
+
+            msg.textContent = result;
+            msg.className = res.ok ? "message success" : "message error";
+
+            if (res.ok) {
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1200);
+            }
+        } catch {
+            msg.textContent = "Verification failed. Try again.";
+            msg.className = "message error";
+        }
+    }
+
+    async function resendOtp() {
+        resendBtn.disabled = true;
+        timeLeft = 300;
+        startTimer();
+
+        try {
+            const res = await fetch("/resend-otp", {method: "POST",credentials: "same-origin"});
+
+            const result = await res.text();
+
+            msg.textContent = result;
+            msg.className = "message success";
+        } catch {
+            msg.textContent = "Failed to resend OTP";
+            msg.className = "message error";
+        }
+    }
+
+    startTimer();
+</script>
+
+</body>
+</html>

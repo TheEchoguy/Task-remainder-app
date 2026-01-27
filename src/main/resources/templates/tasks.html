@@ -3,88 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <title>All Tasks</title>
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+
+    <script src="/js/clock.js" defer></script>
+
 </head>
 <body>
-
-<header class="app-header">
-    <div class="header-container">
-        <h1>Task Reminder Application</h1>
-        <div class="header-actions">
-            <a th:href="@{/api/tasks/add}" class="btn btn-primary">+ Add Task</a>
-        </div>
-    </div>
-</header>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="page-wrapper">
     <div class="card">
 
-        <h2>All Tasks</h2>
+        <div class="card-title-row">
+            <h2>All Tasks</h2>
 
-        <!-- Filters -->
-        <form class="filters" th:action="@{/api/tasks}" method="get">
-            <label>Status:</label>
-            <select name="status" class="filter-input">
-                <option value="">All</option>
-                <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
-                        th:value="${s}"
-                        th:text="${#strings.capitalize(#strings.replace(s.name().toLowerCase(),'_',' '))}">
-                </option>
-            </select>
+            <div class="card-actions">
+                <button id="toggleViewBtn"
+                        class="btn-add-task secondary"
+                        type="button">
+                    Card View
+                </button>
 
-            <label>Priority:</label>
-            <select name="priority" class="filter-input">
-                <option value="">All</option>
-                <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
-                        th:value="${p}"
-                        th:text="${#strings.capitalize(p.name().toLowerCase())}">
-                </option>
-            </select>
-            <label>Title:</label>
-            <input type="text" name="keyword" placeholder="Search title"
-                   class="filter-input" th:value="${param.keyword}">
 
-            <button class="btn btn-clear">Filter</button>
-            <a th:href="@{/api/tasks}" class="btn btn-clear">Clear</a>
-            <div class="sort-group">
-                <span class="sort-label">Sort:</span>
+                <div class="export-dropdown">
+                    <button class="btn-export"
+                            th:disabled="${taskCount == 0}">
+                        Export ▾
+                    </button>
 
-                <a th:href="@{/api/tasks(
-                        sort='dueDate',
-                    status=${param.status},
-                    priority=${param.priority},
-                    keyword=${param.keyword}
-                    )}"
-                    class="sort-link">
-                    Due Date
-                </a>
 
-                <a th:href="@{/api/tasks(
-                    sort='priority',
-                    status=${param.status},
-                    priority=${param.priority},
-                    keyword=${param.keyword}
-                    )}"
-                    class="sort-link">
-                    Priority
-                </a>
-
-                <a th:href="@{/api/tasks(
-                    sort='title',
-                    status=${param.status},
-                    priority=${param.priority},
-                    keyword=${param.keyword}
-                    )}"
-                    class="sort-link">
-                    Title
-                </a>
+                    <div class="export-menu">
+                        <a href="/api/tasks/export/download">📥 Download CSV</a>
+                        <a href="/api/tasks/export/email">📧 Send to Email</a>
+                    </div>
+                </div>
+                <a href="/calendar" class="btn-add-task">Calendar View</a>
+                <a href="/api/tasks/add" class="btn-add-task">Add Task</a>
             </div>
+        </div>
 
+
+        <form class="filters" th:action="@{/api/tasks}" method="get">
+
+        <!-- Status -->
+        <label>Status:</label>
+        <select name="status" class="filter-input">
+            <option value="">All</option>
+            <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
+                    th:value="${s}"
+                    th:text="${#strings.capitalize(#strings.replace(s.name().toLowerCase(),'_',' '))}">
+            </option>
+        </select>
+
+        <!-- Priority -->
+        <label>Priority:</label>
+        <select name="priority" class="filter-input">
+            <option value="">All</option>
+            <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
+                    th:value="${p}"
+                    th:text="${#strings.capitalize(p.name().toLowerCase())}">
+            </option>
+        </select>
+
+        <!-- Title -->
+        <label>Title:</label>
+        <input type="text"
+               name="keyword"
+               placeholder="Search title"
+               class="filter-input"
+               th:value="${param.keyword}">
+
+        <!-- Actions -->
+        <button class="btn btn-filter">Filter</button>
+        <a th:href="@{/api/tasks}" class="btn btn-clear">Clear</a>
+
+        <!-- Sort -->
+        <div class="sort-group">
+            <span class="sort-label">Sort:</span>
+
+            <a th:href="@{/api/tasks(
+                sort='dueDate',
+                status=${param.status},
+                priority=${param.priority},
+                keyword=${param.keyword}
+            )}"
+               class="sort-btn">
+                Due Date
+            </a>
+
+            <a th:href="@{/api/tasks(
+                sort='priority',
+                status=${param.status},
+                priority=${param.priority},
+                keyword=${param.keyword}
+            )}"
+               class="sort-btn">
+                Priority
+            </a>
+
+            <a th:href="@{/api/tasks(
+                sort='title',
+                status=${param.status},
+                priority=${param.priority},
+                keyword=${param.keyword}
+            )}"
+               class="sort-btn">
+                Title
+            </a>
+        </div>
 
         </form>
-
-        <!-- Table -->
-        <table>
+        <div id="listView">
+            <!-- Table -->
+            <table>
             <thead>
             <tr>
                 <th>ID</th>
@@ -100,8 +133,15 @@
             </thead>
 
             <tbody>
-            <tr th:each="task : ${tasks}">
-                <td th:text="${task.id}"></td>
+            <tr th:each="task : ${tasks}"
+                th:classappend="${task.status != T(com.tracker.app.enums.TaskStatus).DONE
+                and task.dueDate != null
+                and task.dueDate < #dates.format(#dates.createNow(),'yyyy-MM-dd')}
+                ? 'overdue' : ''">
+
+
+
+            <td th:text="${task.id}"></td>
                 <td th:text="${task.title}"></td>
                 <td th:text="${task.description}"></td>
                 <td th:text="${task.dueDate}"></td>
@@ -150,9 +190,10 @@
                     </a>
 
                     <!-- Mark Done (only if NOT DONE) -->
+                    <!-- Mark Done -->
                     <a th:if="${task.status != T(com.tracker.app.enums.TaskStatus).DONE}"
                        th:href="@{/api/tasks/markdone/{id}(id=${task.id})}"
-                       class="icon-btn"
+                       class="icon-btn mark-done"
                        title="Mark as Done"
                        onclick="return confirm('Mark this task as DONE?')">
 
@@ -165,21 +206,27 @@
                                   stroke-linejoin="round"/>
                         </svg>
                     </a>
-
                 </td>
 
             </tr>
             </tbody>
-            <tr th:if="${#lists.isEmpty(tasks)}">
-                <td colspan="9" style="text-align:center; padding:20px;">
-                    No tasks found.
-                </td>
-            </tr>
+                <tr th:if="${#lists.isEmpty(tasks)}">
+                    <td colspan="9" class="table-empty">
+                        <div class="table-empty-content">
+                            <span class="icon">🗂️</span>
+                            <p>No tasks found</p>
+                            <a href="/api/tasks/add" class="btn-add-task small">
+                                + Add Task
+                            </a>
+                        </div>
+                    </td>
+                </tr>
 
-        </table>
 
-        <!-- Pagination -->
-        <div class="pagination" th:if="${totalPages > 1}">
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination" th:if="${totalPages > 1}">
             <a class="page-btn"
                th:classappend="${currentPage==0}? ' disabled':''"
                th:href="@{/api/tasks(page=${currentPage-1})}">‹ Prev</a>
@@ -193,14 +240,151 @@
             <a class="page-btn"
                th:classappend="${currentPage==totalPages-1}? ' disabled':''"
                th:href="@{/api/tasks(page=${currentPage+1})}">Next ›</a>
+            </div>
         </div>
+        <div id="cardView" class="task-cards" style="display:none">
+            <div class="empty-state" th:if="${#lists.isEmpty(tasks)}">
+                <div class="empty-icon">🗂️</div>
+                <h3>No tasks found</h3>
+                <p>You don’t have any tasks yet.<br>Click below to add your first task.</p>
+                <a href="/api/tasks/add" class="btn-add-task">
+                    + Add Task
+                </a>
+            </div>
 
+            <div class="task-card"
+                 th:each="task : ${tasks}"
+                 th:classappend="${task.status != T(com.tracker.app.enums.TaskStatus).DONE
+                and task.dueDate != null
+                and task.dueDate < #dates.format(#dates.createNow(),'yyyy-MM-dd')}
+                ? 'overdue' : ''">
+
+
+
+            <!-- Title -->
+                <h3 th:text="${task.title}">Task Title</h3>
+
+                <!-- Description -->
+                <p class="desc" th:text="${task.description}">Description</p>
+
+                <!-- Status + Priority -->
+                <div class="meta">
+            <span class="status"
+                  th:text="${#strings.capitalize(task.status.name().toLowerCase())}"
+                  th:classappend="${task.status.name()=='DONE'} ? ' status-done':' status-pending'">
+            </span>
+
+                    <span class="badge"
+                          th:text="${#strings.capitalize(task.priority.name().toLowerCase())}"
+                          th:classappend="' badge-' + ${task.priority.name().toLowerCase()}">
+            </span>
+                </div>
+
+                <!-- Dates -->
+                <div class="dates">
+                    <div>
+                        📅 Due:
+                        <span th:text="${task.dueDate}"></span>
+                    </div>
+
+                    <div>
+                        ✅ Completed:
+                        <span th:if="${task.completedAt != null}"
+                              th:text="${#temporals.format(task.completedAt,'dd-MM-yyyy HH:mm')}"
+                              class="completed"></span>
+                        <span th:if="${task.completedAt == null}">—</span>
+                    </div>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="card-actions-row">
+
+                    <a th:href="@{/api/tasks/view/{id}(id=${task.id})}"
+                       class="action-btn">View</a>
+
+                    <a th:href="@{/api/tasks/edit/{id}(id=${task.id})}"
+                       class="action-btn">Edit</a>
+
+                    <a th:href="@{/api/tasks/delete/{id}(id=${task.id})}"
+                       class="action-btn danger"
+                       onclick="return confirm('Delete this task?')">
+                        Delete
+                    </a>
+
+                    <a th:if="${task.status != T(com.tracker.app.enums.TaskStatus).DONE}"
+                       th:href="@{/api/tasks/markdone/{id}(id=${task.id})}"
+                       class="icon-btn mark-done"
+                       title="Mark as Done"
+                       onclick="return confirm('Mark this task as DONE?')">
+
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17l-5-5"
+                                  stroke="#2e8b57"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+
+
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 
-<footer class="footer">
-    © 2025 Task Reminder Application — Created by <strong>Santhosh</strong>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<div id="toast"
+     th:if="${toastSuccess != null}"
+     class="toast success"
+     th:text="${toastSuccess}">
+</div>
+
+<div id="toast-error"
+     th:if="${toastError != null}"
+     class="toast error"
+     th:text="${toastError}">
+</div>
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById("toast");
+        const errorToast = document.getElementById("toast-error");
+        if (toast) toast.remove();
+        if (errorToast) errorToast.remove();
+    }, 3500);
+</script>
+<script>
+    const toggleBtn = document.getElementById("toggleViewBtn");
+    const listView = document.getElementById("listView");
+    const cardView = document.getElementById("cardView");
+
+    let isCardView = false;
+
+    function animate(el) {
+        el.classList.remove("view-transition");
+        void el.offsetWidth; // reflow hack
+        el.classList.add("view-transition");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+        isCardView = !isCardView;
+
+        if (isCardView) {
+            listView.style.display = "none";
+            cardView.style.display = "grid";
+            animate(cardView);
+            toggleBtn.textContent = "List View";
+        } else {
+            cardView.style.display = "none";
+            listView.style.display = "block";
+            animate(listView);
+            toggleBtn.textContent = "Card View";
+        }
+    });
+</script>
 
 </body>
 </html>

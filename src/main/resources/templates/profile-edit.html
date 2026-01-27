@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css"/>
+
+    <script src="/js/clock.js" defer></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="profile-container">
+    <div class="profile-card">
+
+        <h2>Edit Profile</h2>
+
+        <!-- Avatar Preview -->
+        <div class="avatar-wrapper">
+            <img id="avatarPreview"
+                 th:src="${user.profileImage != null
+         ? '/profile/image/' + user.profileImage
+         : '/images/default-profile.png'}"
+                 class="avatar-circle">
+        </div>
+
+        <!-- Crop Area -->
+        <div id="cropSection" class="crop-section hidden">
+            <img id="cropImage">
+            <button type="button" id="applyCrop" class="btn btn-primary">
+                Apply Crop
+            </button>
+        </div>
+
+
+
+        <form id="profileForm"
+              th:action="@{/profile/update}"
+              method="post"
+              th:object="${profile}"
+              enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" th:field="*{name}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" th:field="*{email}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Profile Picture</label>
+                <input type="file"
+                       id="imageInput"
+                       name="profileImage"
+                       accept="image/*">
+                <small class="hint">Crop before saving</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="/profile" class="btn">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+<script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script src="/js/profile-crop.js"></script>
+
+</body>
+</html>

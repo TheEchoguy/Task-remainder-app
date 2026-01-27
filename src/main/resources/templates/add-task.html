@@ -4,85 +4,209 @@
     <meta charset="UTF-8">
     <title>Add Task</title>
 
-    <!-- External CSS -->
     <link rel="stylesheet" th:href="@{/css/add-task.css}">
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+    <script src="/js/clock.js" defer></script>
 </head>
 <body>
 
-<!-- ===== Header ===== -->
-<header class="app-header">
-    <div class="header-container">
-        <h1>Task Reminder Application</h1>
+<div th:replace="~{fragments/header :: header}"></div>
 
-        <a th:href="@{/api/tasks}" class="header-btn">
-            Task List
-        </a>
-    </div>
-</header>
-
-<!-- ===== Page Wrapper ===== -->
 <div class="page-wrapper">
 
-    <div class="card">
+    <div class="task-form">
+        <div class="form-content">
 
-        <h2>Add New Task</h2>
+            <h2>Add New Task</h2>
 
-        <!-- Error Message -->
-        <div th:if="${errorMessage}" class="error-box">
-            <p th:text="${errorMessage}"></p>
+            <form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
+
+                <!-- Title -->
+                <div class="form-group full">
+                    <label>Title <span>*</span></label>
+                    <input type="text"
+                           th:field="*{title}"
+                           placeholder="What do you need to do?"
+                           required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group full">
+                    <label>Description</label>
+                    <textarea th:field="*{description}"
+                              placeholder="Add a short description (optional)"></textarea>
+                </div>
+
+                <!-- Due Date + Reminder -->
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Due Date <span>*</span></label>
+                        <input type="date"
+                               th:field="*{dueDate}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reminder</label>
+
+                        <input type="datetime-local"
+                               id="reminderTime"
+                               th:field="*{reminderTime}">
+
+                        <div class="reminder-controls">
+                            <span class="reminder-label">Remind me:</span>
+
+                            <select class="reminder-select"
+                                    id="reminderSelect"
+                                    disabled
+                                    onchange="applyReminderOffset(this.value)">
+
+                            <option value="">Select</option>
+                                <option value="due">At due time</option>
+                                <option value="1h">1 hour before</option>
+                                <option value="1d">1 day before</option>
+                                <option value="clear">Clear reminder</option>
+                            </select>
+                        </div>
+
+                        <small>Email reminder (optional)</small>
+                    </div>
+
+
+
+                </div>
+
+
+                <!-- Status + Priority -->
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select th:field="*{status}">
+                            <option value="">Select status</option>
+                            <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
+                                    th:value="${s}"
+                                    th:text="${#strings.capitalize(s.name().toLowerCase())}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select th:field="*{priority}">
+                            <option value="">Select priority</option>
+                            <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
+                                    th:value="${p}"
+                                    th:text="${#strings.capitalize(p.name().toLowerCase())}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Save Task</button>
+                    <a th:href="@{/api/tasks}" class="btn secondary">Cancel</a>
+                </div>
+
+            </form>
+
         </div>
-
-        <!-- Form -->
-        <form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
-
-            <label>Title <span class="required">*</span></label>
-            <input type="text"
-                   th:field="*{title}"
-                   placeholder="Enter task title"
-                   required
-                   minlength="3"
-                   maxlength="100"/>
-
-            <label>Description</label>
-            <textarea th:field="*{description}"
-                      placeholder="Enter task description"
-                      maxlength="200"></textarea>
-
-            <label>Due Date <span class="required">*</span></label>
-            <input type="date" th:field="*{dueDate}" required/>
-
-            <label>Status</label>
-            <select th:field="*{status}">
-                <option value="">-- Select Status --</option>
-                <option th:each="s : ${T(com.tracker.app.enums.TaskStatus).values()}"
-                        th:value="${s}"
-                        th:text="${#strings.capitalize(#strings.replace(s.name().toLowerCase(), '_', ' '))}">
-                </option>
-            </select>
-
-            <label>Priority</label>
-            <select th:field="*{priority}">
-                <option value="">-- Select Priority --</option>
-                <option th:each="p : ${T(com.tracker.app.enums.TaskPriority).values()}"
-                        th:value="${p}"
-                        th:text="${#strings.capitalize(p.name().toLowerCase())}">
-                </option>
-            </select>
-
-            <!-- Buttons -->
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save Task</button>
-                <a th:href="@{/api/tasks}" class="btn btn-secondary">Cancel</a>
-            </div>
-
-        </form>
     </div>
 </div>
 
-<!-- ===== Footer ===== -->
-<footer class="footer">
-    © 2025 Task Reminder Application — Created by <strong>Santhosh</strong>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dueDateInput = document.querySelector('input[type="date"]');
+        const today = new Date().toISOString().split("T")[0];
+        dueDateInput.min = today;
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dueDateInput = document.querySelector('input[type="date"]');
+        const reminderInput = document.getElementById("reminderTime");
+
+        function updateReminderLimits() {
+            const now = new Date();
+            now.setSeconds(0,0);
+            reminderInput.min = now.toISOString().slice(0,16);
+
+            if (dueDateInput.value) {
+                const due = new Date(dueDateInput.value);
+                due.setHours(23,59,0,0);
+                reminderInput.max = due.toISOString().slice(0,16);
+            }
+        }
+
+        dueDateInput.addEventListener("change", updateReminderLimits);
+        updateReminderLimits();
+    });
+</script>
+<script>
+    function applyReminderOffset(value) {
+        const dueDateInput = document.querySelector('input[type="date"]');
+        const reminderInput = document.getElementById("reminderTime");
+
+        if (!dueDateInput.value) {
+            alert("Please select a due date first");
+            return;
+        }
+
+        if (value === "clear") {
+            reminderInput.value = "";
+            return;
+        }
+
+        const due = new Date(dueDateInput.value);
+
+        // Default task time (you can change this)
+        due.setHours(9, 0, 0, 0);
+
+        if (value === "due") {
+            // keep as-is → at due time
+        }
+
+        if (value === "1h") {
+            due.setHours(due.getHours() - 1);
+        }
+
+        if (value === "1d") {
+            due.setDate(due.getDate() - 1);
+        }
+
+        const now = new Date();
+
+        if (due < now) {
+            alert("Reminder must be in the future");
+            reminderInput.value = "";
+            return;
+        }
+
+        reminderInput.value = due.toISOString().slice(0, 16);
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dueDateInput = document.querySelector('input[type="date"]');
+        const reminderSelect = document.getElementById("reminderSelect");
+
+        // Disable initially
+        reminderSelect.disabled = true;
+
+        dueDateInput.addEventListener("change", () => {
+            reminderSelect.disabled = !dueDateInput.value;
+            reminderSelect.value = ""; // reset when due date changes
+        });
+    });
+</script>
+
+
+
 
 </body>
 </html>

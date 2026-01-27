@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Task Reminder App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(#f4f8ff, #ffffff);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .navbar {
+            height: 64px;
+            background: #1f78d1;
+            color: #fff;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* ===== LAYOUT ===== */
+        .page {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 36px;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h2 {
+            text-align: center;
+            margin-bottom: 6px;
+            color: #1f2937;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #1f78d1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(31,120,209,0.15);
+        }
+
+        /* ===== PASSWORD ===== */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 44px;
+        }
+
+        .eye-btn {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            transition: 0.2s;
+        }
+
+        .eye-btn:hover {
+            color: #1f78d1;
+        }
+
+        /* ===== BUTTON ===== */
+        .btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 13px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1f78d1, #155aa8);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 10px 20px rgba(31,120,209,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 26px rgba(31,120,209,0.35);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .footer a {
+            color: #1f78d1;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== MESSAGE ===== */
+        .message {
+            margin-bottom: 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .error { color: #dc2626; }
+        .success { color: #16a34a; }
+
+    </style>
+</head>
+<body>
+
+<div class="navbar">Task Reminder App</div>
+
+<div class="page">
+    <div class="card">
+
+        <h2>Welcome Back 👋</h2>
+        <div class="subtitle">Login to manage your tasks and reminders</div>
+
+        <div id="message" class="message"></div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button type="button" class="eye-btn" onclick="togglePassword('password')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M1 12C1 12 5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12Z"
+                              stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="3"
+                                stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <button class="btn" onclick="login()">Login</button>
+
+        <div class="footer">
+            Don’t have an account?
+            <a href="/register">Create account</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    async function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const msg = document.getElementById("message");
+
+        msg.textContent = "";
+        msg.className = "message";
+
+        if (!email || !password) {
+            msg.textContent = "Email and password are required";
+            msg.classList.add("error");
+            return;
+        }
+
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.text();
+
+            if (response.ok) {
+                msg.textContent = result;
+                msg.classList.add("success");
+                setTimeout(() => {
+                    window.location.href = "/dashboard";
+                }, 600);
+            } else {
+                msg.textContent = result;
+                msg.classList.add("error");
+            }
+        } catch {
+            msg.textContent = "Login failed. Try again.";
+            msg.classList.add("error");
+        }
+    }
+</script>
+
+</body>
+</html>

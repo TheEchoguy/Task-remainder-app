@@ -1,107 +1,107 @@
-/* ===== Base ===== */
+/* ===== BASE ===== */
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     background: #f3f5f8;
 }
 
-/* ===== Header ===== */
-/* ===== Header (FULL WIDTH FIX) ===== */
-.app-header {
-    background: linear-gradient(90deg, #1f78b4, #2b8fd8);
-    padding: 16px 32px;   /* space from edges */
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-}
-
-.header-container {
-    width: 100%;          /* FULL WIDTH */
-    max-width: none;      /* REMOVE 1200px LIMIT */
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.app-header h1 {
-    margin: 0;
-    color: white;
-    font-size: 22px;
-    font-weight: 600;
-}
-
-.header-btn {
-    background: white;
-    color: #1f78b4;
-    padding: 8px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.header-btn:hover {
-    background: #f0f6fb;
-    transform: translateY(-1px);
-}
-
-
-/* ===== Page Layout ===== */
+/* ===== PAGE WRAPPER ===== */
 .page-wrapper {
     min-height: calc(100vh - 140px);
-    padding: 48px 24px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    padding: 28px 32px 24px;
 }
 
-/* ===== Card ===== */
-.card {
+/* ===== FORM CARD ===== */
+.task-form {
+    position: relative;
     width: 100%;
-    max-width: 640px;
-    background: white;
-    padding: 36px 40px;
-    border-radius: 14px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    max-width: 1180px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 28px 48px 32px 60px;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.10);
+    animation: fadeUp 0.4s ease;
 }
 
-/* ===== Headings ===== */
-h2 {
-    margin-top: 0;
-    margin-bottom: 26px;
+/* Accent bar */
+.task-form::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #1f78b4, #2b8fd8);
+    border-radius: 18px 0 0 18px;
+}
+
+/* ===== TITLE ===== */
+.form-content h2 {
+    margin: 0 0 16px;
     font-size: 24px;
 }
 
-/* ===== Form ===== */
+/* ===== FORM LAYOUT ===== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+}
+
+.form-group.full {
+    grid-column: span 2;
+}
+
+/* Two-column rows */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 18px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #eef2f7;
+}
+
+.form-row:last-of-type {
+    border-bottom: none;
+}
+
+/* ===== LABELS ===== */
 label {
-    display: block;
-    margin-bottom: 8px;
     font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
 }
 
-.required {
-    color: red;
+label span {
+    color: #ef4444;
+    font-weight: 700;
 }
 
-/* Inputs */
-input[type="text"],
-input[type="date"],
+/* ===== INPUTS ===== */
+input,
 textarea,
 select {
-    width: 100%;
     padding: 12px 14px;
-    margin-bottom: 22px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #d1d5db;
-    font-size: 15px;
+    font-size: 14.5px;
+    background: #fff;
+    transition: 0.2s ease;
 }
 
 textarea {
-    height: 120px;
-    resize: vertical;
+    height: 74px;
+    resize: none;
 }
 
-/* Focus */
 input:focus,
 textarea:focus,
 select:focus {
@@ -109,60 +109,126 @@ select:focus {
     border-color: #1f78b4;
     box-shadow: 0 0 0 3px rgba(31,120,180,0.15);
 }
+/* ===== SELECT DROPDOWN ARROW POSITION ===== */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 
-/* ===== Buttons ===== */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%236b7280' d='M5.5 7.5L10 12l4.5-4.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 16px;
+    background-position: right 14px center; /* ⬅️ move arrow LEFT */
+    padding-right: 44px; /* space so text doesn’t overlap arrow */
+}
+select:focus {
+    box-shadow: 0 0 0 3px rgba(31,120,180,0.15);
+}
+
+
+/* ===== DATE & TIME INPUT ===== */
+input[type="date"],
+input[type="datetime-local"] {
+    padding-right: 35px;
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+    padding: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* ===== REMINDER CONTROLS ===== */
+.reminder-controls {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reminder-label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.reminder-select {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #93c5fd;
+    background: #eef6ff;
+    color: #1f78b4;
+    cursor: pointer;
+}
+
+.reminder-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+small {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ===== ACTION BUTTONS ===== */
 .form-actions {
-    margin-top: 28px;
+    margin-top: 18px;
     display: flex;
     gap: 14px;
 }
 
+/* Buttons */
 .btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    padding: 11px 22px;
+    border-radius: 12px;
+    font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
+    border: none;
+    transition: 0.2s ease;
 }
 
-.btn-primary {
-    background: #1f78b4;
-    color: white;
-    border-color: #1f78b4;
+.btn.primary {
+    background: linear-gradient(135deg, #1f78b4, #2b8fd8);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(31,120,180,0.25);
 }
 
-.btn-primary:hover {
-    background: #1769a3;
+.btn.primary:hover {
+    background: linear-gradient(135deg, #155a8a, #1f78b4);
+    transform: translateY(-1px);
 }
 
-.btn-secondary {
-    background: #f3f4f6;
-    color: #333;
+.btn.secondary {
+    background: #f1f5f9;
+    color: #374151;
+    border: 1px solid #d1d5db;
 }
 
-.btn-secondary:hover {
+.btn.secondary:hover {
     background: #e5e7eb;
 }
 
-/* ===== Error Box ===== */
-.error-box {
-    background: #fff0f0;
-    color: #b22222;
-    border: 1px solid #f1b0b0;
-    padding: 12px 14px;
-    border-radius: 8px;
-    margin-bottom: 18px;
-}
-
-/* ===== Footer ===== */
-.footer {
-    margin-top: auto;
-    text-align: center;
-    font-size: 14px;
-    color: #555;
-    padding: 18px;
-    background: #f8f9fa;
-    border-top: 1px solid #e5e7eb;
+/* ===== ANIMATION ===== */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
