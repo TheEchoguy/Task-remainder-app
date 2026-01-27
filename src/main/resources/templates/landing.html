@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task Reminder App</title>
+    <link rel="stylesheet" th:href="@{/css/landing.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="landing-header">
+    <div class="logo">Task Reminder App</div>
+    <div class="header-actions">
+        <a href="/login" class="btn-outline">Login</a>
+        <a href="/register" class="btn-primary">Get Started</a>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-text">
+        <h1>
+            Organize your tasks.<br>
+            <span>Stay productive.</span>
+        </h1>
+
+        <p>
+            A simple and powerful task reminder app to manage deadlines,
+            priorities, and progress — all in one place.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="/register" class="btn-primary">Create Account</a>
+            <a href="/login" class="btn-outline">Login</a>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <img src="/images/hero.png" alt="Task Illustration">
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+    <h2>Why use Task Reminder App?</h2>
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <img src="/images/task.png">
+            <h3>Smart Task Management</h3>
+            <p>Create, edit, and organize tasks with priorities and due dates.</p>
+        </div>
+
+        <div class="feature-card">
+            <img src="/images/reminder.png">
+            <h3>Flexible Reminders</h3>
+            <p>Get reminders at due time, before deadlines, or custom schedules.</p>
+        </div>
+
+        <div class="feature-card">
+            <img src="/images/progress.png">
+            <h3>Track Progress</h3>
+            <p>Mark tasks as done and stay motivated every day.</p>
+        </div>
+
+        <div class="feature-card">
+            <img src="/images/calendar.png">
+            <h3>Calendar View</h3>
+            <p>Visualize tasks on a calendar and plan effectively.</p>
+        </div>
+
+    </div>
+</section>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

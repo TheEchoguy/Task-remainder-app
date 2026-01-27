@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+    <script src="/js/clock.js" defer></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="dashboard-container">
+
+    <h2 class="page-title">Dashboard Overview</h2>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-cards">
+        <div class="stat-card">
+            <h4>Total Tasks</h4>
+            <p class="stat-number" th:text="${total}">0</p>
+        </div>
+
+        <div class="stat-card success">
+            <h4>Completed</h4>
+            <p class="stat-number" th:text="${completed}">0</p>
+        </div>
+
+        <div class="stat-card warning">
+            <h4>Pending</h4>
+            <p class="stat-number" th:text="${pending}">0</p>
+        </div>
+
+        <div class="stat-card danger">
+            <h4>Overdue</h4>
+            <p class="stat-number" th:text="${overdue}">0</p>
+        </div>
+
+        <div class="stat-card info">
+            <h4>Due Today</h4>
+            <p class="stat-number" th:text="${dueToday}">0</p>
+        </div>
+
+        <div class="stat-card primary">
+            <h4>High Priority</h4>
+            <p class="stat-number" th:text="${highPriority}">0</p>
+        </div>
+    </div>
+
+
+    <!-- Recent Tasks -->
+    <!-- Recent Tasks -->
+    <div class="recent-section">
+        <div class="recent-header">
+            <h3>Recent Tasks</h3>
+            <div class="recent-actions">
+                <a href="/api/tasks" class="btn">View All Tasks</a>
+                <a href="/api/tasks/add" class="btn btn-primary">Add Task</a>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Due Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${recentTasks}">
+                <td th:text="${task.title}"></td>
+                <td>
+                    <span class="status"
+                          th:text="${#strings.capitalize(#strings.replace(task.status.name().toLowerCase(),'_',' '))}"
+                          th:classappend="${task.status.name()=='DONE'} ? ' status-done':' status-pending'">
+                    </span>
+                </td>
+                <td>
+                    <span class="badge"
+                          th:text="${#strings.capitalize(task.priority.name().toLowerCase())}"
+                          th:classappend="' badge-' + ${task.priority.name().toLowerCase()}">
+                    </span>
+                </td>
+                <td th:text="${task.dueDate != null ? task.dueDate : '-'}"></td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(recentTasks)}">
+                <td colspan="4" class="empty">No recent tasks</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Task</title>
+
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/view-task.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+    <script src="/js/clock.js" defer></script>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="page-wrapper">
+    <div class="task-view-card">
+
+        <h2>View Task</h2>
+
+        <div class="details-grid">
+
+            <div class="label">ID</div>
+            <div class="value" th:text="${task.id}"></div>
+
+            <div class="label">Title</div>
+            <div class="value strong" th:text="${task.title}"></div>
+
+            <div class="label">Description</div>
+            <div class="value" th:text="${task.description}"></div>
+
+            <div class="label">Due Date</div>
+            <div class="value"
+                 th:text="${task.dueDate != null ? task.dueDate : '—'}">
+            </div>
+
+
+
+            <div class="label">Reminded At</div>
+            <div class="value">
+                <span th:if="${task.reminderTime != null}"
+                th:text="${#temporals.format(task.reminderTime,'dd-MM-yyyy HH:mm')}">
+                </span>
+                <span th:if="${task.reminderTime == null}" class="muted">—</span>
+            </div>
+
+
+
+
+            <div class="label">Status</div>
+            <div class="value">
+                <span class="badge status-done"
+                      th:if="${task.status == T(com.tracker.app.enums.TaskStatus).DONE}">
+                    Done
+                </span>
+                <span class="badge status-pending"
+                      th:if="${task.status == T(com.tracker.app.enums.TaskStatus).PENDING}">
+                    Pending
+                </span>
+                <span class="badge status-progress"
+                      th:if="${task.status == T(com.tracker.app.enums.TaskStatus).IN_PROGRESS}">
+                    In Progress
+                </span>
+            </div>
+
+            <div class="label">Priority</div>
+            <div class="value">
+                <span class="badge priority-high"
+                      th:if="${task.priority == T(com.tracker.app.enums.TaskPriority).HIGH}">
+                    High
+                </span>
+                <span class="badge priority-medium"
+                      th:if="${task.priority == T(com.tracker.app.enums.TaskPriority).MEDIUM}">
+                    Medium
+                </span>
+                <span class="badge priority-low"
+                      th:if="${task.priority == T(com.tracker.app.enums.TaskPriority).LOW}">
+                    Low
+                </span>
+            </div>
+
+            <div class="label">Created At</div>
+            <div class="value"
+                 th:text="${#temporals.format(task.createdAt,'dd-MM-yyyy HH:mm')}"></div>
+
+            <div class="label">Completed At</div>
+            <div class="value muted">
+                <span th:if="${task.completedAt != null}"
+                      th:text="${#temporals.format(task.completedAt,'dd-MM-yyyy HH:mm')}"></span>
+                <span th:if="${task.completedAt == null}">—</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a th:href="@{/api/tasks}" class="btn secondary">Back</a>
+
+            <a th:href="@{/api/tasks/edit/{id}(id=${task.id})}"
+               class="btn primary">
+                Edit
+            </a>
+
+            <a th:if="${task.status != T(com.tracker.app.enums.TaskStatus).DONE}"
+               th:href="@{/api/tasks/markdone/{id}(id=${task.id})}"
+               onclick="return confirm('Mark this task as DONE?')"
+               class="btn success">
+                Mark Done
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

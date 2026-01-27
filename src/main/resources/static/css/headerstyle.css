@@ -1,0 +1,89 @@
+.header {
+    width: 100%;
+    height: 64px;
+    background-color: #1f78d1;
+    color: #fff;
+    padding: 0 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 2px solid #165fa3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* App title */
+.brand {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.welcome {
+    font-size: 16px;
+}
+
+.clock {
+    font-family: monospace;
+    background: #1764ad;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.btn-header {
+    text-decoration: none;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f78d1;
+    border: 1px solid #d0d7de;
+    transition: all 0.2s ease;
+}
+
+.btn-header:hover {
+    background: #e8f2ff;
+}
+
+.btn-primary {
+    background: #0b5ed7;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #084298;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+}
+
+.header .profile-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}

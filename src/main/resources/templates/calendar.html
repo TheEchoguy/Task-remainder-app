@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Calendar View</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/calendar.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+
+    <script src="/js/clock.js" defer></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="calendar-container">
+
+    <div class="calendar-header">
+        <button class="nav-btn" onclick="prevMonth()">◀</button>
+        <h2 id="monthTitle"></h2>
+        <button class="nav-btn" onclick="nextMonth()">▶</button>
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="calendar-grid">
+
+            <div class="day-name"
+                 th:each="d : ${ {'Sun','Mon','Tue','Wed','Thu','Fri','Sat'} }"
+                 th:text="${d}">
+            </div>
+
+            <!-- Day cells injected by JS -->
+
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    const year = [[${year}]];
+    const month = [[${month}]] - 1;
+    const tasksByDate = /*[[${tasksByDate}]]*/ {};
+    let currentYear = year;
+    let currentMonth = month;
+</script>
+
+<script src="/js/calendar.js"></script>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

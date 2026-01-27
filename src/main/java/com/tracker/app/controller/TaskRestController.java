@@ -1,9 +1,14 @@
 package com.tracker.app.controller;
 
 
+import com.tracker.app.dto.OtpRequest;
 import com.tracker.app.entity.Task;
+import com.tracker.app.entity.User;
+import com.tracker.app.enums.TaskPriority;
+import com.tracker.app.enums.TaskStatus;
 import com.tracker.app.service.TaskService;
 
+import com.tracker.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +27,15 @@ public class TaskRestController {
 
     @Autowired
     private final TaskService taskService;
+    private final UserService userService;
+
 
     @Autowired
-    public TaskRestController(TaskService taskService){
+    public TaskRestController(TaskService taskService, UserService userService){
     this.taskService = taskService;
+    this.userService = userService;
     }
+
     @GetMapping
     public ResponseEntity<Page<Task>> getAll(Pageable pageable){
         Page<Task> page= taskService.findAll(pageable);
@@ -46,14 +55,14 @@ public class TaskRestController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Task> create(@RequestBody Task task) {
+    public ResponseEntity<Task> create(@RequestBody Task task,Integer userId) {
         task.setCreatedAt(LocalDateTime.now());
-        Task saved = taskService.addTask(task);
+        Task saved = taskService.addTask(task,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> update(@PathVariable Integer id, @RequestBody Task task) {
+    public ResponseEntity<Task> update(@PathVariable Integer id, @RequestBody Task task,Integer userId) {
         Optional<Task> existing = taskService.findById(id);
         if (existing.isEmpty()) return ResponseEntity.notFound().build();
 
@@ -62,7 +71,7 @@ public class TaskRestController {
         }
 
         task.setId(id);
-        Task updated = taskService.updateTask(task);
+        Task updated = taskService.updateTask(id,task,userId);
         return ResponseEntity.ok(updated);
     }
 
@@ -75,22 +84,67 @@ public class TaskRestController {
     }
 
    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Task>> getByStatus(@PathVariable String status) {
-        return ResponseEntity.ok(taskService.findByStatus(status));
+    public ResponseEntity<Page<Task>> getByStatus(@PathVariable TaskStatus status,Pageable pageable) {
+        return ResponseEntity.ok(taskService.findByStatus(status,pageable));
     }
 
    @GetMapping("/priority/{priority}")
-    public ResponseEntity<List<Task>> getByPriority(@PathVariable String priority) {
-        return ResponseEntity.ok(taskService.findByPriority(priority));
+    public ResponseEntity<Page<Task>> getByPriority(@PathVariable TaskPriority priority,Pageable pageable) {
+        return ResponseEntity.ok(taskService.findByPriority(priority,pageable));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Task>> searchByTitle(@RequestParam("keyword") String keyword) {
-        return ResponseEntity.ok(taskService.searchByTitle(keyword));
+    public ResponseEntity<Page<Task>> searchByTitle(@RequestParam("keyword") String keyword,Pageable pageable) {
+        return ResponseEntity.ok(taskService.searchByTitle(keyword,pageable));
     }
 
     @GetMapping("/due")
     public ResponseEntity<List<Task>> getByDueDate(@RequestParam("date") String date) {
         return ResponseEntity.ok(taskService.findByDueDate(date));
     }
+
+    @GetMapping("/due-today")
+    public ResponseEntity<List<Task>> getTasksDueToday() {
+        return ResponseEntity.ok(taskService.getTasksDueToday());
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<Task>> getUpcomingTasks(
+            @RequestParam(defaultValue = "3") int days) {
+
+        return ResponseEntity.ok(taskService.getUpcomingTasks(days));
+    }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<List<Task>> getOverdueTasks() {
+        return ResponseEntity.ok(taskService.getOverdueTasks());
+    }
+
+    @PostMapping("/userRegister")
+    public ResponseEntity<?> registerApi(@RequestBody User user) {
+
+        try {
+            userService.register(user);
+            return ResponseEntity.ok("OTP sent to your email");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestBody OtpRequest request) {
+
+        String response = userService.verifyOtp(request.getEmail(), request.getOtp());
+
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/resendOtp")
+    public ResponseEntity<?> resendOtp(@RequestBody OtpRequest request) {
+
+        String response = userService.resendOtp(request.getEmail());
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

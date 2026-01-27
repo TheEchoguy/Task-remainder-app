@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="footer">
+    © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
+    Task Reminder Application —
+    Created by <strong>Santhosh</strong>
+</footer>
+
+</body>
+</html>

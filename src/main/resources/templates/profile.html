@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/headerstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/footerstyle.css}">
+
+    <script src="/js/clock.js" defer></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- MAIN CONTENT -->
+<div class="profile-container">
+    <div class="profile-card">
+
+        <!-- Profile Avatar -->
+        <div class="profile-avatar">
+            <img th:src="${user.profileImage != null
+                ? '/profile/image/' + user.profileImage
+                : '/images/default-profile.png'}"
+                 alt="Profile Picture"
+                 style="width:120px;height:120px;border-radius:50%;object-fit:cover;">
+        </div>
+
+        <h2 th:text="${user.name}">User Name</h2>
+        <p class="email" th:text="${user.email}">email@example.com</p>
+
+        <div class="profile-actions">
+            <a href="/profile/edit" class="btn btn-primary">Edit Profile</a>
+        </div>
+
+        <p class="success"
+           th:if="${successMessage}"
+           th:text="${successMessage}">
+        </p>
+
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>
