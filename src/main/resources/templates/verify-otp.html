@@ -246,9 +246,15 @@
             msg.className = res.ok ? "message success" : "message error";
 
             if (res.ok) {
-                setTimeout(() => {
-                    window.location.href = "/login";
-                }, 1200);
+            setTimeout(() => {
+
+            if (result === "RESET_PASSWORD") {
+                 window.location.href = "/reset-password";
+            } else if (result === "Email verified successfully") {
+                 window.location.href = "/login";
+            }
+
+            }, 1200);
             }
         } catch {
             msg.textContent = "Verification failed. Try again.";

@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Map;
@@ -45,12 +42,12 @@ public class AuthController {
             return "redirect:/verify-otp";
 
         } catch (IllegalStateException ex) {
-            // ✅ Already registered
+            //  Already registered
             redirect.addFlashAttribute("error", ex.getMessage());
             return "redirect:/register";
 
         } catch (RuntimeException ex) {
-            // ✅ OTP already sent / retry flow
+            //  OTP already sent / retry flow
             session.setAttribute("otpEmail", user.getEmail());
             redirect.addFlashAttribute("success", ex.getMessage());
             return "redirect:/verify-otp";
@@ -75,18 +72,33 @@ public class AuthController {
         if (email == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body("Session expired. Please register again.");
+                    .body("Session expired. Please try again.");
         }
 
-        String response = userService.verifyOtp(email, request.getOtp());
+        Boolean resetFlow = (Boolean) session.getAttribute("resetFlow");
+        boolean isReset = Boolean.TRUE.equals(resetFlow);
 
-        if ("Email verified successfully".equals(response)) {
+        String response = userService.verifyOtp(
+                email,
+                request.getOtp(),
+                isReset
+        );
+
+        // ✅ FORGOT PASSWORD FLOW
+        if ("OTP verified".equals(response) && isReset) {
+            return ResponseEntity.ok("RESET_PASSWORD");
+        }
+
+        // ✅ REGISTRATION FLOW
+        if ("OTP verified".equals(response)) {
             session.removeAttribute("otpEmail");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok("Email verified successfully");
         }
 
+        // ❌ ACTUAL ERRORS ONLY
         return ResponseEntity.badRequest().body(response);
     }
+
 
 
 
@@ -165,7 +177,86 @@ public class AuthController {
         session.invalidate();
         return "redirect:/";
     }
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "forgot-password";
+    }
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(
+            @RequestParam String email,
+            HttpSession session,
+            RedirectAttributes redirect) {
 
+        userService.sendForgotOtp(email);
+        session.setAttribute("otpEmail", email);
+        session.setAttribute("resetFlow", true);
 
+        redirect.addFlashAttribute(
+                "success",
+                "OTP sent to your email"
+        );
+        return "redirect:/verify-otp";
+    }
+    @GetMapping("/reset-password")
+    public String showResetPasswordPage(HttpSession session) {
 
+        // Optional safety check
+        if (session.getAttribute("otpEmail") == null) {
+            return "redirect:/login";
+        }
+
+        return "reset-password";
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestBody Map<String, String> body,
+            HttpSession session) {
+
+        String newPassword = body.get("password");
+
+        if (newPassword == null || newPassword.length() < 6) {
+            return ResponseEntity.badRequest()
+                    .body("Password must be at least 6 characters");
+        }
+
+        Boolean profileChange = (Boolean) session.getAttribute("profileChange");
+
+        if (Boolean.TRUE.equals(profileChange)) {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Session expired");
+            }
+
+            userService.updatePasswordById(userId, newPassword);
+            session.removeAttribute("profileChange");
+
+        } else {
+            String email = (String) session.getAttribute("otpEmail");
+            if (email == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Session expired");
+            }
+
+            userService.updatePassword(email, newPassword);
+            session.removeAttribute("otpEmail");
+            session.removeAttribute("resetFlow");
+        }
+
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
+    @GetMapping("/change-password")
+    public String changePassword(HttpSession session) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        // mark this as profile-initiated password change
+        session.setAttribute("profileChange", true);
+
+        return "reset-password";
+    }
 }

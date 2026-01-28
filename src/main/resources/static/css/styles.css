@@ -386,6 +386,62 @@ tbody tr:hover {
     pointer-events: none;
 }
 
+/* ================= CARD VIEW PAGINATION FIX ================= */
+
+#cardView {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* FULL ROW */
+.card-pagination-wrapper {
+    grid-column: 1 / -1;     /* 🔥 THIS is the key */
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+/* Pagination buttons */
+.card-pagination {
+    display: flex;
+    gap: 10px;
+}
+
+
+.card-pagination a {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.card-pagination a.active {
+    background: linear-gradient(135deg, #1f78d1, #155aa8);
+    color: #fff;
+    border-color: #1f78d1;
+    box-shadow: 0 6px 16px rgba(31,120,209,0.4);
+}
+
+.card-pagination a.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
 /* ================= FOOTER ================= */
 .footer {
     text-align: center;

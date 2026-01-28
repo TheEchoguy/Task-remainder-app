@@ -34,12 +34,12 @@ public class UserService {
         if (existingOpt.isPresent()) {
             User existing = existingOpt.get();
 
-            // ✅ Case 1: Email already verified → must login
+            //  Case 1: Email already verified → must login
             if (Boolean.TRUE.equals(existing.isVerified())) {
                 throw new IllegalStateException("Account already exists. Please login.");
             }
 
-            // ✅ Case 2: Email exists but not verified → resend OTP
+            // Case 2: Email exists but not verified → resend OTP
             String otpCode = String.valueOf((int) (Math.random() * 900000) + 100000);
             existing.setOtp(otpCode);
             existing.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
@@ -50,7 +50,7 @@ public class UserService {
             throw new RuntimeException("OTP already sent. Please verify.");
         }
 
-        // ✅ Case 3: New user registration
+        //  Case 3: New user registration
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setVerified(false);
 
@@ -62,22 +62,32 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String verifyOtp(String email, String otp) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) return "User not found";
-        User existingUser = user.get();
-        if (existingUser.isVerified()) return "User already verified";
-        if (existingUser.getOtp() == null) return "OTP not generated";
-        if (!existingUser.getOtp().equals(otp)) return "Invalid OTP";
-        if (existingUser.getOtpExpiry().isBefore(LocalDateTime.now()))
+    public String verifyOtp(String email, String otp, boolean resetFlow) {
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return "User not found";
+
+        User user = userOpt.get();
+
+        if (user.getOtp() == null) return "OTP not generated";
+        if (!user.getOtp().equals(otp)) return "Invalid OTP";
+        if (user.getOtpExpiry().isBefore(LocalDateTime.now()))
             return "OTP expired";
 
-        existingUser.setVerified(true);
-        existingUser.setOtp(null);
-        existingUser.setOtpExpiry(null);
-        userRepository.save(existingUser);
-        return "Email verified successfully";
+        // 🔹 Registration flow
+        if (!resetFlow) {
+            if (user.isVerified()) return "User already verified";
+            user.setVerified(true);
+        }
+
+        // 🔹 Clear OTP for both flows
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+        userRepository.save(user);
+
+        return "OTP verified";
     }
+
 
     public String resendOtp(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -157,5 +167,49 @@ public class UserService {
     public Optional<User> findById(Integer id) {
         return userRepository.findById(id);
     }
+    public void sendForgotOtp(String email) {
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        if (!Boolean.TRUE.equals(user.isVerified())) {
+            throw new RuntimeException("User is not verified");
+        }
+
+        String otpCode = String.valueOf((int) (Math.random() * 900000) + 100000);
+        user.setOtp(otpCode);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+
+        emailService.sendOTP(user.getEmail(), otpCode);
+        userRepository.save(user);
+    }
+    public void updatePassword(String email, String newPassword) {
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        // clear OTP after successful reset
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+
+        userRepository.save(user);
+    }
+    public void updatePasswordById(Integer userId, String newPassword) {
+        User user = getUserById(userId);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+
 
 }

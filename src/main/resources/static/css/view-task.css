@@ -1,4 +1,9 @@
 /* ===== PAGE WRAPPER ===== */
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin:0px;
+}
 .page-wrapper {
     padding: 48px 24px;
     display: flex;

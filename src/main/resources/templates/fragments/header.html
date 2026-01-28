@@ -9,7 +9,6 @@
 
         <span th:if="${session.userId != null}" class="user-section">
 
-            <!-- Profile Icon -->
             <a href="/profile" class="profile-link" title="My Profile">
             <img th:src="${session.profileImage != null
                 ? '/profile/image/' + session.profileImage + '?v=' + #dates.createNow().time
@@ -17,13 +16,10 @@
                  class="profile-icon">
             </a>
 
-
-            <!-- Welcome text -->
             <span class="welcome">
                 Welcome, <b th:text="${session.name}">User</b>!
             </span>
 
-            <!-- Clock -->
             <span id="liveClock" class="clock">--:--</span>
 
             <a href="/dashboard" class="btn-header">Dashboard</a>

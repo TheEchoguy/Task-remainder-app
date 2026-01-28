@@ -25,7 +25,6 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
-    /* ================= VIEW PROFILE ================= */
     @GetMapping("/profile")
     public String viewProfile(Model model, HttpSession session) {
 
@@ -38,7 +37,7 @@ public class ProfileController {
         return "profile";
     }
 
-    /* ================= EDIT PROFILE PAGE ================= */
+
     @GetMapping("/profile/edit")
     public String editProfile(HttpSession session, Model model) {
 
@@ -63,7 +62,6 @@ public class ProfileController {
 
 
 
-    /* ================= UPDATE PROFILE ================= */
     @PostMapping("/profile/update")
     public String updateProfile(
             @ModelAttribute("profile") UpdateProfileRequest dto,
@@ -73,10 +71,10 @@ public class ProfileController {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) return "redirect:/login";
 
-        // 🔥 get updated user
+        //  get updated user
         User updatedUser = userService.updateProfile(userId, dto);
 
-        // 🔥 update session so header updates
+        // update session so header updates
         session.setAttribute("name", updatedUser.getName());
         session.setAttribute("profileImage", updatedUser.getProfileImage());
 

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        /* ===== RESET ===== */
         * {
             box-sizing: border-box;
             font-family: "Segoe UI", Arial, sans-serif;
@@ -177,7 +176,22 @@
 
         .error { color: #dc2626; }
         .success { color: #16a34a; }
+        .forgot-link {
+        text-align: right;
+        margin-top: -8px; /* pulls it closer to password */
+        margin-bottom: 18px;
+        }
 
+        .forgot-link a {
+        font-size: 13px;
+        color: #1f78d1;
+        font-weight: 600;
+        text-decoration: none;
+        }
+
+        .forgot-link a:hover {
+        text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -211,6 +225,11 @@
                 </button>
             </div>
         </div>
+        <div class="forgot-link">
+            <a href="#" onclick="startForgotPassword()">Forgot password?</a>
+        </div>
+
+
 
         <button class="btn" onclick="login()">Login</button>
 
@@ -264,6 +283,17 @@
         } catch {
             msg.textContent = "Login failed. Try again.";
             msg.classList.add("error");
+        }
+    }
+</script>
+<script>
+    function startForgotPassword() {
+        const ok = confirm(
+            "To reset your password, we need to re-verify your email using OTP.\n\nDo you want to continue?"
+        );
+
+        if (ok) {
+            window.location.href = "/forgot-password";
         }
     }
 </script>
