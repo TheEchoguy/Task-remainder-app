@@ -118,8 +118,8 @@ select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%236b7280' d='M5.5 7.5L10 12l4.5-4.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-size: 16px;
-    background-position: right 14px center; /* ⬅️ move arrow LEFT */
-    padding-right: 44px; /* space so text doesn’t overlap arrow */
+    background-position: right 14px center;
+    padding-right: 44px;
 }
 select:focus {
     box-shadow: 0 0 0 3px rgba(31,120,180,0.15);

@@ -9,6 +9,7 @@ import com.tracker.app.enums.TaskStatus;
 import com.tracker.app.service.TaskService;
 
 import com.tracker.app.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -132,11 +133,32 @@ public class TaskRestController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody OtpRequest request) {
+    public ResponseEntity<?> verify(@RequestBody OtpRequest request,
+                                    HttpSession session) {
 
-        String response = userService.verifyOtp(request.getEmail(), request.getOtp());
+        String email = (String) session.getAttribute("otpEmail");
 
-        return ResponseEntity.ok(response);
+        if (email == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Session expired. Please register again.");
+        }
+
+        Boolean resetFlow = (Boolean) session.getAttribute("resetFlow");
+        boolean isReset = Boolean.TRUE.equals(resetFlow);
+
+        String response = userService.verifyOtp(
+                email,
+                request.getOtp(),
+                isReset
+        );
+
+        if ("Email verified successfully".equals(response)) {
+            session.removeAttribute("otpEmail");
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.badRequest().body(response);
     }
     @PostMapping("/resendOtp")
     public ResponseEntity<?> resendOtp(@RequestBody OtpRequest request) {

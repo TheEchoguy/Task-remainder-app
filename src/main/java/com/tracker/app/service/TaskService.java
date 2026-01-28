@@ -49,7 +49,7 @@ public class TaskService {
         Task existing = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        // 🔐 Security check
+        // Security check
         if (!existing.getUser().getId().equals(userId)) {
             throw new RuntimeException("Unauthorized access");
         }

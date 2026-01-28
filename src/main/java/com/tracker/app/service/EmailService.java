@@ -13,7 +13,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    /* ================= SEND OTP ================= */
     public void sendOTP(String toEmail, String otp) {
 
         try {
@@ -65,7 +64,7 @@ public class EmailService {
     }
 
 
-    /* ================= TASK REMINDER ================= */
+
     public void sendTaskReminder(Task task) {
 
         if (task.getUser() == null || task.getUser().getEmail() == null) {

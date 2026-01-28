@@ -229,17 +229,17 @@
             <div class="pagination" th:if="${totalPages > 1}">
             <a class="page-btn"
                th:classappend="${currentPage==0}? ' disabled':''"
-               th:href="@{/api/tasks(page=${currentPage-1})}">‹ Prev</a>
+               th:href="@{/api/tasks(page=${currentPage-1}, view='list')}">‹ Prev</a>
 
             <a th:each="i : ${#numbers.sequence(0,totalPages-1)}"
-               th:href="@{/api/tasks(page=${i})}"
+               th:href="@{/api/tasks(page=${i}, view='list')}"
                th:text="${i+1}"
                class="page-number"
                th:classappend="${i==currentPage}? ' active':''"></a>
 
             <a class="page-btn"
                th:classappend="${currentPage==totalPages-1}? ' disabled':''"
-               th:href="@{/api/tasks(page=${currentPage+1})}">Next ›</a>
+               th:href="@{/api/tasks(page=${currentPage+1}, view='list')}">Next ›</a>
             </div>
         </div>
         <div id="cardView" class="task-cards" style="display:none">
@@ -331,7 +331,29 @@
                 </div>
 
             </div>
+            <div class="card-pagination-wrapper" th:if="${totalPages > 1}">
+                <div class="card-pagination">
+                    <a th:classappend="${currentPage==0}? ' disabled':''"
+                       th:href="@{/api/tasks(page=${currentPage-1},view='card')}">
+                        ‹Prev
+                    </a>
+
+                    <a th:each="i : ${#numbers.sequence(0,totalPages-1)}"
+                       th:href="@{/api/tasks(page=${i},view='card')}"
+                       th:text="${i+1}"
+                       th:classappend="${i==currentPage}? ' active':''">
+                    </a>
+
+                    <a th:classappend="${currentPage==totalPages-1}? ' disabled':''"
+                       th:href="@{/api/tasks(page=${currentPage+1},view='card')}">
+                        Next›
+                    </a>
+                </div>
+            </div>
+
+
         </div>
+
     </div>
 </div>
 
@@ -361,30 +383,34 @@
     const listView = document.getElementById("listView");
     const cardView = document.getElementById("cardView");
 
-    let isCardView = false;
-
-    function animate(el) {
-        el.classList.remove("view-transition");
-        void el.offsetWidth; // reflow hack
-        el.classList.add("view-transition");
+    function getParam(name) {
+        return new URLSearchParams(window.location.search).get(name);
     }
 
-    toggleBtn.addEventListener("click", () => {
-        isCardView = !isCardView;
-
-        if (isCardView) {
+    function setView(view) {
+        if (view === "card") {
             listView.style.display = "none";
             cardView.style.display = "grid";
-            animate(cardView);
             toggleBtn.textContent = "List View";
         } else {
             cardView.style.display = "none";
             listView.style.display = "block";
-            animate(listView);
             toggleBtn.textContent = "Card View";
         }
+    }
+
+    // On page load
+    const currentView = getParam("view") || "list";
+    setView(currentView);
+
+    toggleBtn.addEventListener("click", () => {
+        const newView = currentView === "card" ? "list" : "card";
+        const params = new URLSearchParams(window.location.search);
+        params.set("view", newView);
+        window.location.search = params.toString();
     });
 </script>
+
 
 </body>
 </html>

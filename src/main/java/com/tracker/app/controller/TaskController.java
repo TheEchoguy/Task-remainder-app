@@ -36,7 +36,7 @@ public class TaskController {
     @GetMapping()
     public String listTasks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "6") int size,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) TaskPriority priority,
             @RequestParam(required = false) String keyword,
@@ -49,9 +49,6 @@ public class TaskController {
             return "redirect:/login";
         }
 
-    /* =======================
-       SORT HANDLING
-       ======================= */
         Pageable pageable;
         if ("dueDate".equals(sort)) {
             pageable = PageRequest.of(page, size,
@@ -129,6 +126,9 @@ public class TaskController {
         }
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.PENDING);
+        }
+        if (task.getPriority() == null) {
+            task.setPriority(TaskPriority.LOW);
         }
         // Reset reminder flag if reminder time exists
         if (task.getReminderTime() != null) {
@@ -234,7 +234,7 @@ public class TaskController {
             task.setStatus(TaskStatus.DONE);
             task.setCompletedAt(LocalDateTime.now());
 
-            // 🔥 IMPORTANT: disable reminders
+            // IMPORTANT: disable reminders
             task.setReminderTime(null);
             task.setReminderSent(true); // prevents scheduler pickup
 
@@ -346,10 +346,6 @@ public class TaskController {
 
         return "redirect:/api/tasks";
     }
-
-
-
-
 
     private String escape(String value) {
         if (value == null) return "";
